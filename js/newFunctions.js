@@ -2635,10 +2635,340 @@ function f(b) {
   currentSum += b;
   return f; // <-- не вызывает себя. Просто возвращает
 }
-Функция f будет использоваться в последующем вызове и снова возвращать себя столько раз, сколько будет необходимо. Затем, при использовании в качестве числа или строки, метод toString возвращает currentSum – число. Также здесь мы можем использовать Symbol.toPrimitive или valueOf для преобразования.*/
+Функция f будет использоваться в последующем вызове и снова возвращать себя 
+столько раз, сколько будет необходимо. Затем, при использовании в качестве числа или строки, 
+метод toString возвращает currentSum – число. Также здесь мы можем использовать Symbol.toPrimitive или valueOf для преобразования.*/
 /*--------------------------------------------------------------------------------------------------------------------------------------------------*/
 ////let func = new Function('a,b', 'return a + b');
 //console.log(func(1,2));
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*let timerId = setInterval(() => console.log("ничего не происходит"), 1000);
+//console.log(timerId); // идентификатор таймера
+clearTimeout(timerId);
+console.log('catcatcat');
+console.log('catcatcat');
+console.log('catcatcat');
+console.log('catcatcat');*/
+/**Вывод каждую секунду
+важность: 5
+Напишите функцию printNumbers(from, to), которая выводит число каждую секунду, начиная от from и заканчивая to.
+
+Сделайте два варианта решения.
+
+Используя setInterval.
+Используя рекурсивный setTimeout. */
+
+
+//setTimeout(printNumbers(from, to), 1000);*/
+/*
+//через timeout
+function printNumbers(from, to) {
+  console.log('считаем от ',from,' до ',to)
+  let current = from;
+  if (from >= to) {
+    return;
+  };
+  let timer = setTimeout(function showNum() {
+    console.log('current timer: ', current);
+    current++;
+    if (current <= to) {
+      timer = setTimeout(showNum, 1000);
+    }
+  }, 1000);
+
+}
+printNumbers(10, 20);
+printNumbers(20, 23);
+*/
+
+//через interval
+/*
+function printNumbers(from, to) {
+  console.log('считаем от ', from, ' до ', to)
+  let current = from;
+  if (from >= to) {
+    return;
+  };
+
+  let timer = setInterval(function showNum() {
+    if (current <= to) {
+      console.log('current timer: ', current);
+      current++;
+    } else {
+      clearInterval(timer);
+    }
+  }, 1000);
+}
+printNumbers(10, 20);
+*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**Что покажет setTimeout?
+важность: 5
+В приведённом ниже коде запланирован вызов setTimeout, а затем выполняется сложное вычисление, для завершения которого требуется более 100 мс.
+
+Когда будет выполнена запланированная функция?
+
+После цикла.
+Перед циклом.
+В начале цикла.
+Что покажет alert?
+
+let i = 0;
+
+setTimeout(() => alert(i), 100); // ?
+
+// предположим, что время выполнения этой функции >100 мс
+for(let j = 0; j < 100000000; j++) {
+  i++;
+} */
+/*
+let i = 0;
+
+setTimeout(() => alert(i), 100); // ?
+
+// предположим, что время выполнения этой функции >100 мс
+for(let j = 0; j < 100000000; j++) {
+  i++;
+}*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*function slow(x) {
+  // здесь могут быть ресурсоёмкие вычисления
+  console.log(`Called with ${x}`);
+  return x;
+}
+
+function cachingDecorator(func) {
+  let cache = new Map();
+
+  return function(x) {
+    if (cache.has(x)) {    // если кеш содержит такой x,
+      return cache.get(x); // читаем из него результат
+    }
+
+    let result = func(x); // иначе, вызываем функцию
+
+    cache.set(x, result); // и кешируем (запоминаем) результат
+    return result;
+  };
+}
+
+slow = cachingDecorator(slow);
+console.log('вот она функция: ',slow);
+
+console.log( slow(1) ); // slow(1) кешируем
+console.log( "Again: " + slow(1) ); // возвращаем из кеша
+console.log( slow(2) ); // slow(2) кешируем
+console.log( "Again: " + slow(2) ); // возвращаем из кеша
+
+let map= new Map();
+map.set("name", "Misha");
+map.set("name", "Grisha");
+console.log(map);
+*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*let worker = {
+  someMethod() {
+    return 1;
+  },
+
+  slow(x) {
+    alert("Called with " + x);
+    return x * this.someMethod(); // (*)
+  }
+};
+
+function cachingDecorator(func) {
+  let cache = new Map();
+  return function(x) {
+    if (cache.has(x)) {
+      return cache.get(x);
+    }
+    let result = func.call(this, x); // теперь 'this' передаётся правильно
+    cache.set(x, result);
+    return result;
+  };
+}
+
+worker.slow = cachingDecorator(worker.slow); // теперь сделаем её кеширующей
+
+alert( worker.slow(2) ); // работает
+alert( worker.slow(2) ); // работает, не вызывая первоначальную функцию (кешируется)
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*
+let worker = {
+  slow(min, max) {
+    console.log(`Called with ${min},${max}`);
+    return min + max;
+  }
+};
+
+function cachingDecorator(func, hash) {
+  let cache = new Map();
+  return function() {
+    let key = hash(arguments); // (*)
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+
+    let result = func.call(this, ...arguments); // (**)
+
+    cache.set(key, result);
+    return result;
+  };
+}
+
+function hash(args) {
+  return args[0] + ',' + args[1];
+}
+
+worker.slow = cachingDecorator(worker.slow, hash);
+
+console.log( worker.slow(3, 5) ); // работает
+console.log( "Again " + worker.slow(3, 5) ); // аналогично (из кеша)
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/**Декоратор-шпион
+важность: 5
+Создайте декоратор spy(func), который должен возвращать обёртку, которая сохраняет все вызовы функции в своём свойстве calls.
+
+Каждый вызов должен сохраняться как массив аргументов.
+
+Например:
+
+function work(a, b) {
+  alert( a + b ); // произвольная функция или метод
+}
+
+work = spy(work);
+
+work(1, 2); // 3
+work(4, 5); // 9
+
+for (let args of work.calls) {
+  alert( 'call:' + args.join() ); // "call:1,2", "call:4,5"
+}
+P.S.: Этот декоратор иногда полезен для юнит-тестирования. Его расширенная форма – sinon.spy – содержится в библиотеке Sinon.JS. */
+/*
+function work(a, b) {
+  console.log( a + b ); // произвольная функция или метод
+}
+
+function spy(func) {
+  
+  return function wrapper (args) {
+    wrapper.calls.push(...args);
+    return func(args);
+  }
+}
+
+work = spy(work);
+
+work(1, 2); // 3
+work(4, 5); // 9
+
+for (let args of work.calls) {
+  console.log( 'call:' + args.join() ); // "call:1,2", "call:4,5"
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*function pow(x, n) {
+  console.log(n);
+  return (n==1)? x : x*pow(x, n-1);
+}
+console.log(pow(2, 4));*/
+/*
+let company = {
+
+  sales: [{
+    name: 'John',
+    salary: 1000
+  }, {
+    name: 'Alice',
+    salary: 600
+  }],
+
+  shmales: [{
+    name: 'John',
+    salary: 1001
+  }, {
+    name: 'Alice',
+    salary: 601
+  }],
+
+  development: {
+    sites: [{
+      name: 'Peter',
+      salary: 2000
+    }, {
+      name: 'Alex',
+      salary: 1800
+    }],
+
+    internals: [{
+      name: 'Jack',
+      salary: 1300
+    }]
+  }
+};
+
+function getArraysSalaries(obj) {
+  console.log("step");
+  let summa = 0;
+  for (let part of Object.values(obj)) {
+    console.log(summa);
+    if (Array.isArray(part)) {
+      summa += part.reduce((prev, item) => (prev + item.salary), 0)
+      console.log(summa);
+    } else {
+      summa += getArraysSalaries(part);
+      console.log("summa if not arr: ", summa)
+    }
+  }
+  console.log("step summa: ", summa);
+
+  return summa;
+}
+console.log("my answer:", getArraysSalaries(company));
+
+
+function sumSalaries(department) {
+  if (Array.isArray(department)) { // случай (1)
+    return department.reduce((prev, current) => prev + current.salary, 0); // сумма элементов массива
+  } else { // случай (2)
+    let sum = 0;
+    for (let subdep of Object.values(department)) {
+      sum += sumSalaries(subdep); // рекурсивно вызывается для подотделов, суммируя результаты
+    }
+    return sum;
+  }
+}
+console.log('answer of book: ',sumSalaries(company));
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*let salaries = {
+  "John": 100,
+  "Pete": 300,
+  "Mary": 250
+};
+function sumSalaries(department) {
+  return Object.values(department).reduce((prev, employee)=>(prev+employee),0);
+}
+console.log( sumSalaries(salaries) ); // 650*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------*/
 
